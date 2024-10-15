@@ -1,59 +1,68 @@
-let balances = {};
+// Get elements from the DOM
+const contributionsList = document.getElementById("contributions");
+const balanceList = document.getElementById("balance-list");
+const users = [];
 
-// Function to add a person and their balance
-function addPerson() {
-    const name = document.getElementById('name').value.trim();
-    const balance = parseFloat(document.getElementById('balance').value);
+// Event listener for adding contributions
+document.getElementById("add-btn").addEventListener("click", function() {
+    const username = document.getElementById("username").value.trim();
+    const amount = parseFloat(document.getElementById("amount").value);
 
-    if (name && !isNaN(balance)) {
-        balances[name] = (balances[name] || 0) + balance;
-        document.getElementById('name').value = '';
-        document.getElementById('balance').value = '';
+    // Validate input
+    if (username && !isNaN(amount) && amount > 0) {
+        users.push({ name: username, contribution: amount });
+        displayContributions();
+        clearInputs(); // Clear input fields after adding contribution
     } else {
-        alert('Please enter a valid name and balance.');
+        alert("Please enter a valid name and a positive contribution amount.");
     }
+});
+
+// Event listener for calculating balances
+document.getElementById("calculate-btn").addEventListener("click", function() {
+    if (users.length > 0) {
+        calculateBalances();
+    } else {
+        alert("No contributions to calculate.");
+    }
+});
+
+// Function to display contributions in the list
+function displayContributions() {
+    contributionsList.innerHTML = ""; // Clear the list before displaying
+
+    users.forEach(user => {
+        const li = document.createElement("li");
+        li.innerHTML = `${user.name}: $${user.contribution.toFixed(2)}`;
+        contributionsList.appendChild(li);
+    });
 }
 
-// Function to round numbers to 2 decimal places
-function roundTo(value) {
-    return Math.round(value * 100) / 100;
+// Function to calculate and display balances
+function calculateBalances() {
+    balanceList.innerHTML = ""; // Clear balance list before calculating
+
+    const totalAmount = users.reduce((sum, user) => sum + user.contribution, 0);
+    const perPersonShare = totalAmount / users.length;
+
+    users.forEach(user => {
+        const balance = user.contribution - perPersonShare;
+        const li = document.createElement("li");
+
+        if (balance < 0) {
+            li.innerHTML = `${user.name} owes $${Math.abs(balance).toFixed(2)}`;
+        } else if (balance > 0) {
+            li.innerHTML = `${user.name} is owed $${balance.toFixed(2)}`;
+        } else {
+            li.innerHTML = `${user.name} is settled up.`;
+        }
+
+        balanceList.appendChild(li);
+    });
 }
 
-// Function to settle debts and display results
-function settleDebts() {
-    const creditors = [];
-    const debtors = [];
-
-    // Separate creditors and debtors
-    for (const [name, balance] of Object.entries(balances)) {
-        if (balance > 0) {
-            creditors.push({ name, balance });
-        } else if (balance < 0) {
-            debtors.push({ name, balance });
-        }
-    }
-
-    // Settle debts
-    const results = [];
-    while (creditors.length && debtors.length) {
-        const creditor = creditors.pop();
-        const debtor = debtors.pop();
-
-        const amount = Math.min(creditor.balance, -debtor.balance);
-        results.push(`${debtor.name} needs to pay ${creditor.name}: ${roundTo(amount).toFixed(2)}`);
-
-        creditor.balance -= amount;
-        debtor.balance += amount;
-
-        if (creditor.balance > 0) {
-            creditors.push(creditor);
-        }
-        if (debtor.balance < 0) {
-            debtors.push(debtor);
-        }
-    }
-
-    // Display results
-    const resultsContainer = document.getElementById('results');
-    resultsContainer.innerHTML = results.map(result => `<li>${result}</li>`).join('');
+// Clear input fields after adding contribution
+function clearInputs() {
+    document.getElementById("username").value = ""; // Reset username input
+    document.getElementById("amount").value = ""; // Reset amount input
 }
