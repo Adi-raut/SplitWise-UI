@@ -58,4 +58,7 @@ ul {
 
 li {
     padding: 8px;
-    background-color: #f8
+    background-color: #f8f8f8;
+    margin-bottom: 5px;
+    border-radius: 4px;
+}
