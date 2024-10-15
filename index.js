@@ -47,22 +47,4 @@ function calculateBalances() {
 
     users.forEach(user => {
         const balance = user.contribution - perPersonShare;
-        const li = document.createElement("li");
-
-        if (balance < 0) {
-            li.innerHTML = `${user.name} owes $${Math.abs(balance).toFixed(2)}`;
-        } else if (balance > 0) {
-            li.innerHTML = `${user.name} is owed $${balance.toFixed(2)}`;
-        } else {
-            li.innerHTML = `${user.name} is settled up.`;
-        }
-
-        balanceList.appendChild(li);
-    });
-}
-
-// Clear input fields after adding contribution
-function clearInputs() {
-    document.getElementById("username").value = ""; // Reset username input
-    document.getElementById("amount").value = ""; // Reset amount input
-}
+        c
